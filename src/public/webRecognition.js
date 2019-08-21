@@ -1,33 +1,49 @@
-$('#btn_start').click(function(e){
-	console.log("Start click");
-	init_recognition();
+let recognition;
+let recognizing = false;
+let final_transcript = "";
+let interim_transcript = "";
 
-    // if (nowRecognition){
-	// rec_stop();
-	// this.value = 'スタート';
-	// $('#btn_start').css('background','#ffffff');
-	// if(!isAuto){
-	//     var data = {
-	// 	'id': getUniqID(),
-	// 	'text': results.join('。'),
-	// 	'conf': 1.00,
-	// 	'spk_id':'default',
-	// 	'label':'speech'
-	//     };
-	//     emit(JSON.stringify(data));
-	//     results = [];
-	// }
-    // } else {
-	// rec_start();
-	// this.value = 'ストップ';
-	// $('#btn_start').css('background','#ff0000');
-    // }
-});
+recognition = new webkitSpeechRecognition();
+recognition.lang = 'en-US';
+// recognition.lang = 'ar-lb';
+// recognition.lang = 'es-ec';
+recognition.continuous = true;
+recognition.interimResults = true;
 
-function init_recognition() {
-	let recognition;
-	recognition = new webkitSpeechRecognition();
-	recognition.lang = 'en-US';
-	recognition.continuous = true;
-    recognition.interimResults = true;
+recognition.onstart = function() {
+	recognizing = true;
 }
+
+recognition.onend = function () {
+	recognizing = false;
+	if (ignore_onend) {
+		return;
+	}
+	if (window.getSelection) {
+		window.getSelection().removeAllRanges();
+		var range = document.createRange();
+		range.selectNode(document.getElementById('final_span'));
+		window.getSelection().addRange(range);
+	}
+}
+
+recognition.onresult = function(event) {
+	final_transcript = ""
+	for (var i = event.resultIndex; i < event.results.length; ++i) {
+		if (event.results[i].isFinal) {
+			final_transcript += event.results[i][0].transcript;
+		} else {
+			interim_transcript += event.results[i][0].transcript;
+		}
+	}
+	final_span.innerHTML = final_transcript;
+}
+
+$('#btn_start').click(function(e) {
+	if (recognizing) {
+    recognition.stop();
+    return;
+  }
+	recognition.start();
+	ignore_onend = false;
+});

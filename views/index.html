@@ -1,4 +1,16 @@
 <!DOCTYPE html>
+
+<style>
+#results {
+    font-size: 14px;
+    font-weight: bold;
+    border: 1px solid #ddd;
+    padding: 15px;
+    text-align: left;
+    min-height: 150px;
+  }
+</style>
+
 <html>
   <head>
     <meta charset="utf-8"/>
@@ -10,6 +22,12 @@
     <div id="view">
       <div>Voice recognition</div>
       <input type="button" id="btn_start" value="Start"></input>
+    </div>
+
+    <div id="results">
+      <span id="final_span" class="final"></span>
+      <span id="interim_span" class="interim"></span>
+      <p>
     </div>
 
     <script src="webRecognition.js"></script>
